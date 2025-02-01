@@ -155,10 +155,17 @@ async def check_incoming_messages(event):
         return
     if "already" in m:
         return
-    # Simplified pattern to catch all card formats
-    card_pattern = r'\b\d{15,16}\|(?:\d{1,2}/\d{2,4}|\d{2}/\d{4})\|\d{3}'
+    # Comprehensive patterns to catch all formats
+    card_patterns = [
+        r'\b\d{15,16}\|(?:\d{1,2}/\d{2,4}|\d{2}/\d{4})\|\d{3}',  # Basic card|expiry|cvv format
+        r'\b\d{15,16}(?:\b|(?:\|[^|]+)+)',  # Card with multiple pipe-separated fields
+        r'\b\d{15,16}\s*\|\s*\d{2}/\d{2}\s*\|\s*\d{3}',  # Card|MM/YY|CVV with flexible spacing
+        r'\b\d{15,16}.*?(?:DEBIT|CREDIT|MASTERCARD|VISA)'  # Card with type info
+    ]
     
-    if re.search(card_pattern, str(m)):
+    is_card = any(re.search(pattern, str(m), re.IGNORECASE | re.DOTALL) for pattern in card_patterns)
+    
+    if is_card:
         try:
             x = re.findall(r'\d+', m)
             if len(x) > 20:
