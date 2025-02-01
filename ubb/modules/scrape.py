@@ -180,33 +180,21 @@ async def check_incoming_messages(event):
                         data_cells = rows[1].find_all('td')
                         if len(data_cells) >= 6:
                             bin_info = f"""
-BIN: {data_cells[0].text}
-Country: {data_cells[1].text}
-Vendor: {data_cells[2].text}
-Type: {data_cells[3].text}
-Level: {data_cells[4].text}
-Bank: {data_cells[5].text}"""
+{data_cells[0].text}
+{data_cells[3].text}
+{data_cells[4].text}
+{data_cells[2].text}
+{data_cells[5].text}
+{data_cells[1].text}"""
             
             MSG = f"""
 {m}
 
 {bin_info}"""
             await asyncio.sleep(3)
-            try:
-                # Try to send to DUMP_ID
-                await Ubot.send_message(DUMP_ID, MSG)
-            except ValueError:
-                # If DUMP_ID is invalid, send to the original chat
-                await event.reply(MSG)
-            except Exception as e:
-                print(f"Error sending message: {e}")
-                # Fallback to original chat
-                await event.reply(MSG)
+            await Ubot.send_message(DUMP_ID, MSG)
                 
         except errors.FloodWaitError as e:
             print(f'flood wait: {e.seconds}')
             await asyncio.sleep(e.seconds)
-            try:
-                await Ubot.send_message(DUMP_ID, MSG)
-            except:
-                await event.reply(MSG)
+            await Ubot.send_message(DUMP_ID, MSG)
