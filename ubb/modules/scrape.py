@@ -132,7 +132,10 @@ async def check_incoming_messages(event):
     if event.sender_id == me.id:
         return
     prefixes = ['?', '/', '.', '!']
-    m = event.message.message
+    m = event.message.text or event.message.raw_text
+    if not m:
+        return
+    
     if m.startswith(tuple(prefixes)) or len(m) < 25 or event.is_private or len(m) > 600:
         return
     if "already" in m:
