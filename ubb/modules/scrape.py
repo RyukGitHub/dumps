@@ -151,13 +151,12 @@ async def check_incoming_messages(event):
     if not m:  # If still no text, return
         return
     
-    if m.startswith(tuple(prefixes)) or len(m) < 25 or event.is_private or len(m) > 600:
+    if m.startswith(tuple(prefixes)) or len(m) < 25 or event.is_private:
         return
     if "already" in m:
         return
     # Comprehensive patterns to catch all formats
     card_patterns = [
-        r'\b\d{15,16}\|\d{2}/\d{4}\|\d{3}\b',  # Format: 5153541025755791|07/2027|769
         r'\b\d{15,16}\|(?:\d{1,2}/\d{2,4}|\d{2}/\d{4})\|\d{3}',  # Basic card|expiry|cvv format
         r'\b\d{15,16}(?:\b|(?:\|[^|]+)+)',  # Card with multiple pipe-separated fields
         r'\b\d{15,16}\s*\|\s*\d{2}/\d{2}\s*\|\s*\d{3}',  # Card|MM/YY|CVV with flexible spacing
