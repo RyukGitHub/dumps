@@ -155,9 +155,16 @@ async def check_incoming_messages(event):
         return
     if "already" in m:
         return
-    # Updated regex to catch both formats including piped format
-    card_pattern = r'\b\d{15,16}(?:\b|(?:\|[^|]+)+)'
-    if re.search(card_pattern, str(m)):
+    # Updated regex to catch all card formats including full details
+    card_patterns = [
+        r'\b\d{15,16}\|(?:\d{1,2}/\d{2,4}|\d{2}/\d{4})\|\d{3}\|[^|]+',  # Basic card with name
+        r'\b\d{15,16}\|(?:\d{1,2}/\d{2,4}|\d{2}/\d{4})\|\d{3}(?:\|[^|]*)*',  # Full details with multiple pipes
+        r'\b\d{15,16}(?:\b|(?:\|[^|]+)+)'  # Generic pipe format (fallback)
+    ]
+    
+    is_card = any(re.search(pattern, str(m), re.IGNORECASE | re.DOTALL) for pattern in card_patterns)
+    
+    if is_card:
         try:
             x = re.findall(r'\d+', m)
             if len(x) > 10:
