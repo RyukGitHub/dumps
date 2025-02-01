@@ -155,12 +155,13 @@ async def check_incoming_messages(event):
         return
     if "already" in m:
         return
-    if re.match(r'\d{15,16}', str(m)):
+    if re.search(r'\b\d{15,16}\b', str(m)):
         try:
             x = re.findall(r'\d+', m)
             if len(x) > 10:
                 return
-            BIN = re.search(r'\d{15,16}', m)[0][:6]
+            card_number = re.search(r'\b\d{15,16}\b', str(m))[0]
+            BIN = card_number[:6]
 
             headers = {
                 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
@@ -207,9 +208,8 @@ async def check_incoming_messages(event):
             
             MSG = f"""
 {m}
-
 {bin_info}"""
-            await asyncio.sleep(3)
+            await asyncio.sleep(1)
             await Ubot.send_message(DUMP_ID, MSG)
                 
         except errors.FloodWaitError as e:
