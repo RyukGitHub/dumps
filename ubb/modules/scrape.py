@@ -2,6 +2,7 @@ import re
 import asyncio
 import os
 import io
+import aiohttp
 
 from telethon import events, types, errors
 from telethon.tl.functions.messages import GetHistoryRequest
