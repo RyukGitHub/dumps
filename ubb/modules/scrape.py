@@ -155,7 +155,9 @@ async def check_incoming_messages(event):
         return
     if "already" in m:
         return
-    if re.search(r'\b\d{15,16}\b', str(m)):
+    # Updated regex to catch both formats including piped format
+    card_pattern = r'\b\d{15,16}(?:\b|(?:\|[^|]+)+)'
+    if re.search(card_pattern, str(m)):
         try:
             x = re.findall(r'\d+', m)
             if len(x) > 10:
