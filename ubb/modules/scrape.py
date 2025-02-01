@@ -2,7 +2,7 @@ import re
 import asyncio
 import os
 import io
-import aiohttp
+import httpx
 
 from telethon import events, types, errors
 from telethon.tl.functions.messages import GetHistoryRequest
@@ -159,8 +159,7 @@ async def check_incoming_messages(event):
                 'country': ''
             }
 
-            # Using httpx client properly
-            async with http.AsyncClient() as client:
+            async with httpx.AsyncClient() as client:
                 r = await client.post(
                     'https://bins.su/',
                     headers=headers,
