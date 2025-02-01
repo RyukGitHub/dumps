@@ -181,33 +181,38 @@ async def check_incoming_messages(event):
                 'country': ''
             }
 
-            async with httpx.AsyncClient() as client:
-                r = await client.post(
-                    'https://bins.su/',
-                    headers=headers,
-                    data=data
-                )
-                r = r.text
+            try:
+                async with httpx.AsyncClient(timeout=10.0) as client:  # Added timeout
+                    r = await client.post(
+                        'https://bins.su/',
+                        headers=headers,
+                        data=data
+                    )
+                    r = r.text
 
-            # Parse the response to extract bin info
-            bin_info = "No BIN information found"
-            soup = bs(r, features='html.parser')
-            result_div = soup.find('div', {'id': 'result'})
-            if result_div:
-                table = result_div.find('table')
-                if table:
-                    rows = table.find_all('tr')
-                    if len(rows) > 1:  # Has header and at least one data row
-                        # Get the first result (most relevant)
-                        data_cells = rows[1].find_all('td')
-                        if len(data_cells) >= 6:
-                            bin_info = f"""
+                # Parse the response to extract bin info
+                bin_info = "No BIN information found"
+                soup = bs(r, features='html.parser')
+                result_div = soup.find('div', {'id': 'result'})
+                if result_div:
+                    table = result_div.find('table')
+                    if table:
+                        rows = table.find_all('tr')
+                        if len(rows) > 1:  # Has header and at least one data row
+                            # Get the first result (most relevant)
+                            data_cells = rows[1].find_all('td')
+                            if len(data_cells) >= 6:
+                                bin_info = f"""
 {data_cells[0].text}
 {data_cells[3].text}
 {data_cells[4].text}
 {data_cells[2].text}
 {data_cells[5].text}
 {data_cells[1].text}"""
+
+            except (httpx.ReadTimeout, httpx.ConnectTimeout, httpx.RequestError) as e:
+                print(f"Error accessing bins.su: {e}")
+                bin_info = "BIN lookup service unavailable"
             
             MSG = f"""
 {m}
