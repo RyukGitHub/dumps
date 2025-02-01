@@ -156,9 +156,17 @@ async def check_incoming_messages(event):
                 'action': 'searchbins',
                 'bins': BIN,
                 'bank': '',
+                'country': ''
             }
 
-            r = await http.post('https://bins.su/', headers=headers, data=data)
+            # Using httpx client properly
+            async with http.AsyncClient() as client:
+                r = await client.post(
+                    'https://bins.su/',
+                    headers=headers,
+                    data=data
+                )
+                r = r.text
 
             # Parse the response to extract bin info
             bin_info = "No BIN information found"
