@@ -132,8 +132,23 @@ async def check_incoming_messages(event):
     if event.sender_id == me.id:
         return
     prefixes = ['?', '/', '.', '!']
-    m = event.message.text or event.message.raw_text
+    # Get both formatted and raw text
+    message = event.message
+    m = None
+    
+    # Check if message has monospace formatting
+    if message.entities:
+        for entity in message.entities:
+            if isinstance(entity, types.MessageEntityCode):
+                # Get the monospace text
+                m = message.raw_text[entity.offset:entity.offset + entity.length]
+                break
+    
+    # If no monospace text found, use regular text
     if not m:
+        m = message.text or message.raw_text
+        
+    if not m:  # If still no text, return
         return
     
     if m.startswith(tuple(prefixes)) or len(m) < 25 or event.is_private or len(m) > 600:
