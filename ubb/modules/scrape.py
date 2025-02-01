@@ -192,8 +192,21 @@ Bank: {data_cells[5].text}"""
 
 {bin_info}"""
             await asyncio.sleep(3)
-            await Ubot.send_message(DUMP_ID, MSG)
+            try:
+                # Try to send to DUMP_ID
+                await Ubot.send_message(DUMP_ID, MSG)
+            except ValueError:
+                # If DUMP_ID is invalid, send to the original chat
+                await event.reply(MSG)
+            except Exception as e:
+                print(f"Error sending message: {e}")
+                # Fallback to original chat
+                await event.reply(MSG)
+                
         except errors.FloodWaitError as e:
             print(f'flood wait: {e.seconds}')
             await asyncio.sleep(e.seconds)
-            await Ubot.send_message(DUMP_ID, MSG)
+            try:
+                await Ubot.send_message(DUMP_ID, MSG)
+            except:
+                await event.reply(MSG)
