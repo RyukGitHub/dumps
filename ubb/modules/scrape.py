@@ -142,14 +142,47 @@ async def check_incoming_messages(event):
             if len(x) > 10:
                 return
             BIN = re.search(r'\d{15,16}', m)[0][:6]
-            r = await http.get(f'https://bins.ws/search?bins={BIN}')
+
+            headers = {
+                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+                'content-type': 'application/x-www-form-urlencoded',
+                'origin': 'https://bins.su',
+                'referer': 'https://bins.su/',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36'
+            }
+
+            data = {
+                'action': 'searchbins',
+                'bins': BIN,
+                'bank': '',
+            }
+
+            r = await http.post('https://bins.su/', headers=headers, data=data)
+
+            # Parse the response to extract bin info
+            bin_info = "No BIN information found"
             soup = bs(r, features='html.parser')
-            k = soup.find("div", {"class": "page"})
+            result_div = soup.find('div', {'id': 'result'})
+            if result_div:
+                table = result_div.find('table')
+                if table:
+                    rows = table.find_all('tr')
+                    if len(rows) > 1:  # Has header and at least one data row
+                        # Get the first result (most relevant)
+                        data_cells = rows[1].find_all('td')
+                        if len(data_cells) >= 6:
+                            bin_info = f"""
+BIN: {data_cells[0].text}
+Country: {data_cells[1].text}
+Vendor: {data_cells[2].text}
+Type: {data_cells[3].text}
+Level: {data_cells[4].text}
+Bank: {data_cells[5].text}"""
+            
             MSG = f"""
 {m}
 
-{k.get_text()[62:]}
-"""
+{bin_info}"""
             await asyncio.sleep(3)
             await Ubot.send_message(DUMP_ID, MSG)
         except errors.FloodWaitError as e:
