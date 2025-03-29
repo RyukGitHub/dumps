@@ -20,7 +20,8 @@ def health_check():
 
 # Run Flask server in a separate thread
 def run_web_server():
-    app.run(host="0.0.0.0", port=8080)
+    port = int(os.getenv("PORT", 8080))  # Ensure it uses the PORT variable
+    app.run(host="0.0.0.0", port=port)
 
 async def main():
     async with Ubot:
