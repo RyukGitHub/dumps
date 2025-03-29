@@ -1,6 +1,8 @@
 import importlib
 import sys
 import asyncio
+import threading
+from flask import flask
 
 from ubb import Ubot
 from ubb.modules import ALL_MODULES
@@ -9,6 +11,16 @@ from ubb.modules import ALL_MODULES
 for module_name in ALL_MODULES:
     imported_module = importlib.import_module(f"ubb.modules.{module_name}")
 
+# Create a simple Flask app for Render health checks
+app = Flask(__name__)
+
+@app.route("/")
+def health_check():
+    return "Bot is running!", 200
+
+# Run Flask server in a separate thread
+def run_web_server():
+    app.run(host="0.0.0.0", port=8080)
 
 async def main():
     async with Ubot:
@@ -20,4 +32,5 @@ async def main():
         
 
 if __name__ == '__main__':
+    threading.Thread(target=run_web_server, daemon=True).start()
     asyncio.run(main())
