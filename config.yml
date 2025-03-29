@@ -2,6 +2,6 @@
 api_id: '27264334'
 api_hash: '0d48bec55aca309215ad69cb844868e5'
 # 13 digit channel id startswith - like -111.......
-dump_id: '-1002355829007'
+dump_id: -1002355829007
 # genrate session of ur tg ac for telethon run sessionmaker.py
 string_session: 'f9c533efb6289eab533ba531a785c9b3'
