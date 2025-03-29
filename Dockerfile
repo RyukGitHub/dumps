@@ -6,5 +6,5 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 COPY . .
-EXPOSE 5000
-CMD ["sh", "-c", "python3 -m ubb & python3 -m http.server 5000"]
+EXPOSE 8080
+CMD ["sh", "-c", "python3 -m ubb & python3 -m http.server 8080"]
