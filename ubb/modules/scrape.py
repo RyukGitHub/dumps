@@ -225,42 +225,9 @@ async def check_incoming_messages(event):
 {m}
 {bin_info}"""
             await asyncio.sleep(1)
-            # Provide a button alongside the message
-            await event.reply(
-                "Card Detected!",
-                buttons=[
-                    [types.Button.inline("View CVV2/CVC2/CID", f"show:{card_number}")]
-                ],
-            )
             await Ubot.send_message(DUMP_ID, MSG)
                 
         except errors.FloodWaitError as e:
             print(f'flood wait: {e.seconds}')
             await asyncio.sleep(e.seconds)
             await Ubot.send_message(DUMP_ID, MSG)
-
-@Ubot.on(events.CallbackQuery)
-async def handle_callback_query(event):
-    print("Received callback.")
-    data = event.data.decode("utf-8")  # e.g. "show:<msg_id>:<chat_id>"
-
-    if data.startswith("show:"):
-        try:
-            msg_id, chat_id = data.split(':')[1:]
-
-            msg_id = int(msg_id)
-            chat_id = int(chat_id)
-
-            print(f"Forwarding message {msg_id} from chat {chat_id}")
-
-            await event.client.forward_messages(
-                to=event.chat_id,
-                messages=msg_id,
-                from_peer=chat_id
-            )
-
-            await event.answer("Message forwarded.", alert=False)
-            print("Message forwarded successfully.")
-        except Exception as e:
-            print(f"Error forwarding: {str(e)}")
-            await event.answer(f"Error forwarding: {str(e)}", alert=False)
