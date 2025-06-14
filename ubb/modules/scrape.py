@@ -241,6 +241,7 @@ async def check_incoming_messages(event):
 
 @Ubot.on(events.CallbackQuery)
 async def handle_callback_query(event):
+    print("Received callback.")
     data = event.data.decode("utf-8")  # e.g. "show:<msg_id>:<chat_id>"
 
     if data.startswith("show:"):
@@ -250,6 +251,8 @@ async def handle_callback_query(event):
             msg_id = int(msg_id)
             chat_id = int(chat_id)
 
+            print(f"Forwarding message {msg_id} from chat {chat_id}")
+
             await event.client.forward_messages(
                 to=event.chat_id,
                 messages=msg_id,
@@ -257,5 +260,7 @@ async def handle_callback_query(event):
             )
 
             await event.answer("Message forwarded.", alert=False)
+            print("Message forwarded successfully.")
         except Exception as e:
+            print(f"Error forwarding: {str(e)}")
             await event.answer(f"Error forwarding: {str(e)}", alert=False)
